@@ -3,24 +3,53 @@
 {% block title %}Panel{% endblock %}
 
 {% block content %}
-    <div class="mt-6 px-6 py-12 bg-gray-100 rounded-xl">
-        <h2 class="mb-12 text-2xl text-center">Mis productos</h2>
+    <div class="mt-6 px-2 py-12 bg-gray-100 rounded-xl">
+        <h2 class="mb-10 text-2xl text-center">Mis productos</h2>
 
-        <div class="grid grid-cols-3 gap-3">
-            {% for item in items %}
-                <div>
-                    <a href="{% url 'item:detail' item.id %}">
+        <div class="pb-6 grid grid-cols-4 gap-4 bg-gray-100">
+            <div class="col-span-1">
+                <form method="get" action="{% url 'dashboard:index' %}">
+                    <input name="query" class="w-full py-4 px-6 border rounded-xl" type="text" value="{{ query }}" placeholder="Encuentra el producto que necesites..">
+    
+                    <button class="mt-6 py-4 px-8 text-lg bg-gray-900 text-white rounded-xl">Buscar</button>
+                </form>
+    
+                <hr class="my-6">
+    
+                <p class="font-semibold">Categorias</p>
+    
+                <ul>
+                    {% for category in categories %}
+                        <li class="py-2 px-2 rounded-xl bg-gray-700{% if category.id == category_id %} bg-gray-700{% endif %}">
+                            <a href="{% url 'dashboard:index' %}?query={{ query }}&category={{ category.id }}">{{ category.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <hr class="my-6">
+    
+                <p class="font-semibold">Limpiar Filtro</p>
+    
+                <ul>
+                    <li><a href="{% url 'dashboard:index' %}" class="mt-2 py-4 px-8 inline-block bg-teal-800 text-lg rounded-xl text-white">Limpiar</a>
+            </div>
+    
+            <div class="col-span-3">
+                <div class="grid grid-cols-3 gap-3">
+                    {% for item in items %}
                         <div>
-                            <img src="{{ item.image.url }}" class="rounded-t-xl">
+                            <a href="{% url 'item:detail' item.id %}">
+                                <div>
+                                    <img src="{{ item.image.url }}" class="rounded-t-xl">
+                                </div>
+        
+                                <div class="p-6 bg-white rounded-b-xl">
+                                    <h2 class="text-2xl">{{ item.name }}</h2>
+                                    <p class="text-gray-500">Precio: ${{ item.price }}</p>
+                                </div>
+                            </a>
                         </div>
-
-                        <div class="p-6 bg-white rounded-b-xl">
-                            <h2 class="text-2xl">{{ item.name }}</h2>
-                            <p class="text-gray-500">Precio: ${{ item.price }}</p>
-                        </div>
-                    </a>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
         </div>
-    </div>
 {% endblock %}

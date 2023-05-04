@@ -1,8 +1,9 @@
+from unicodedata import category
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .forms import NewItemForm, EditItemForm
+from .forms import NewCategoryForm, NewItemForm, EditItemForm
 from .models import Category, Item
 
 def items(request):
@@ -15,7 +16,7 @@ def items(request):
         items = items.filter(category_id=category_id)
 
     if query:
-        items = items.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        items = items.filter(Q(name__icontains=query))
 
     return render(request, 'item/items.html', {
         'items': items,
@@ -49,7 +50,33 @@ def new(request):
 
     return render(request, 'item/form.html', {
         'form': form,
-        'title': 'New item',
+        'title': 'Nuevo Producto',
+    })
+
+def detail(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    related_items = Item.objects.filter(category=item.category, is_sold=False).exclude(pk=pk)[0:3]
+
+    return render(request, 'item/detail.html', {
+        'item': item,
+        'related_items': related_items
+    })
+
+def new_category(request):
+    if request.method == 'POST':
+        form = NewCategoryForm(request.POST)
+
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.save()
+
+            return redirect('core:index')
+    else:
+        form = NewCategoryForm()
+
+    return render(request, 'item/form.html', {
+        'form': form,
+        'title': 'Nueva Categoria',
     })
 
 @login_required
